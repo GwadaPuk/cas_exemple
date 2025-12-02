@@ -1,11 +1,91 @@
-from flask import Flask
+from flask import Flask, request, session, redirect, url_for
+from cas import CASClient
 
 app = Flask(__name__)
+app.secret_key = 'DFGtzenDRFz'
 
+cas_client = CASClient(
+    version=3,
+    service_url='http://localhost:8080/login?next=%2Fprofile',
+    server_url='https://ident.univ-amu.fr/cas/login',
+
+)
 
 @app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
+def index():
+    body = """<!DOCTYPE html>
+<html>
+  <head>
+    <title>python-cas Flask example demo</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+  </head>
+  <body>
+    <h1>Welcome to python-cas Flask example demo</h1>
+    <p><a href="/login">CAS Login</a></p>
+    <p>Related post:</p>
+    <ul>
+        <li><a href="https://djangocas.dev/blog/python-cas-flask-example/">python-cas Flask example</a></li>
+    </ul>
+    <hr>
+    <p><a href="https://djangocas.dev/">Project homepage</a></p>
+  </body>
+</html>
+"""
+    return body
+
+@app.route('/profile')
+def profile(method=['GET']):
+    if 'username' in session:
+        return 'Logged in as %s. <a href="/logout">Logout</a>' % session['username']
+    return 'Login required. <a href="/login">Login</a>', 403
+
+@app.route('/login')
+def login():
+    if 'username' in session:
+        # Already logged in
+        return redirect(url_for('profile'))
+
+    next = request.args.get('next')
+    ticket = request.args.get('ticket')
+    if not ticket:
+        # No ticket, the request come from end user, send to CAS login
+        cas_login_url = cas_client.get_login_url()
+        app.logger.debug('CAS login URL: %s', cas_login_url)
+        return redirect(cas_login_url)
+
+    # There is a ticket, the request come from CAS as callback.
+    # need call `verify_ticket()` to validate ticket and get user profile.
+    app.logger.debug('ticket: %s', ticket)
+    app.logger.debug('next: %s', next)
+
+    user, attributes, pgtiou = cas_client.verify_ticket(ticket)
+
+    app.logger.debug(
+        'CAS verify ticket response: user: %s, attributes: %s, pgtiou: %s', user, attributes, pgtiou)
+
+    if not user:
+        return 'Failed to verify ticket. <a href="/login">Login</a>'
+    else:  # Login successfully, redirect according `next` query parameter.
+        session['username'] = user
+        return redirect(next)
+
+
+@app.route('/logout')
+def logout():
+    redirect_url = url_for('logout_callback', _external=True)
+    cas_logout_url = cas_client.get_logout_url(redirect_url)
+    app.logger.debug('CAS logout URL: %s', cas_logout_url)
+
+    return redirect(cas_logout_url)
+
+@app.route('/logout_callback')
+def logout_callback():
+    # redirect from CAS logout request after CAS logout successfully
+    session.pop('username', None)
+    return 'Logged out from CAS. <a href="/login">Login</a>'
+
+def start():
+    app.run()
 
 
 if __name__ == '__main__':
