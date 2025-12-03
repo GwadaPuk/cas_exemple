@@ -1,4 +1,4 @@
-from flask import Flask, request, session, redirect, url_for
+from flask import Flask, request, session, redirect, url_for, jsonify
 from cas import CASClient
 
 app = Flask(__name__)
@@ -13,39 +13,30 @@ cas_client = CASClient(
 
 @app.route('/')
 def index():
-    body = """<!DOCTYPE html>
-<html>
-  <head>
-    <title>python-cas Flask example demo</title>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
-  </head>
-  <body>
-    <h1>Welcome to python-cas Flask example demo</h1>
-    <p><a href="/login">CAS Login</a></p>
-    <p>Related post:</p>
-    <ul>
-        <li><a href="https://djangocas.dev/blog/python-cas-flask-example/">python-cas Flask example</a></li>
-    </ul>
-    <hr>
-    <p><a href="https://djangocas.dev/">Project homepage</a></p>
-  </body>
-</html>
-"""
-    return body
+    return redirect('/static/')
 
-@app.route('/profile')
-def profile(method=['GET']):
+@app.route('/static/')
+#Redirection utile juste en local, sur le serveur NGinx sert lui-même les fichiers static et l'index par default
+def static_index():
+    return redirect('/static/index.html')
+
+@app.route('/data')
+def data(methods=['GET']):
+    data = {}
     if 'username' in session:
-        return 'Logged in as %s. <a href="/logout">Logout</a>' % session['username']
-    return 'Login required. <a href="/login">Login</a>', 403
+        data['username'] = session['username']
+    if 'ticket' in session:
+        data['ticket'] = session['ticket']
+    return jsonify(data)
 
 @app.route('/login')
 def login():
     if 'username' in session:
         # Already logged in
-        return redirect(url_for('profile'))
+        return redirect(url_for(session['next']))
 
     next = request.args.get('next')
+    session['next'] = next
     ticket = request.args.get('ticket')
     if not ticket:
         # No ticket, the request come from end user, send to CAS login
@@ -67,6 +58,7 @@ def login():
         return 'Failed to verify ticket. <a href="/login">Login</a>'
     else:  # Login successfully, redirect according `next` query parameter.
         session['username'] = user
+        session['ticket'] = ticket
         return redirect(next)
 
 
