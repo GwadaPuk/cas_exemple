@@ -12,7 +12,7 @@ if ('username' in res) {
     button.textContent = 'Se déconnecter';
 } else {
     ticket.textContent = 'Vous n\'êtes pas connecté';
-    button.href = "/login?next=ticket";
+    button.href = "/login?next=ticket.html";
     button.textContent = 'Se connecter';
 }
 document.body.appendChild(ticket);
