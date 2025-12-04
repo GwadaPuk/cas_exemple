@@ -24,7 +24,10 @@ def data(methods=['GET']):
 def login():
     if 'username' in session:
         if request.args.get('redirect'):
-            return redirect(request.args.get('redirect'))
+            link = request.args.get('redirect')
+            if link[:4] != "http":
+                link = "https://" + link
+            return redirect(link)
         elif request.args.get('next'):
             return redirect('/static/' + request.args.get('next'))
         else:
