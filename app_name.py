@@ -1,6 +1,6 @@
 from flask import Flask, request, session, redirect, url_for, jsonify
 from cas import CASClient
-from config import cas_server_url, server_name
+from config import cas_server_url, cas_client_url, server_name
 
 app = Flask(__name__)
 app.secret_key = 'DFGtzenDRFz'
@@ -40,7 +40,7 @@ def login():
     ticket = request.args.get('ticket')
     if not ticket:
         # No ticket, the request come from end user, send to CAS login
-        cas_client.service_url = server_name + 'login?next=' + request.args.get('next')
+        cas_client.service_url = cas_client_url + 'login?next=' + request.args.get('next')
         print(server_name + 'login?next=' + request.args.get('next'))
         cas_login_url = cas_client.get_login_url()
         app.logger.debug('CAS login URL: %s', cas_login_url)
