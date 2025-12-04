@@ -33,16 +33,14 @@ def data(methods=['GET']):
 
 @app.route('/login')
 def login():
-    requested_url = url_for('static/' + request.args.get('next'))
-    print(requested_url)
     if 'username' in session:
         # Already logged in
-        return redirect(requested_url)
+        return redirect(request.root_url + request.args.get('next'))
 
     ticket = request.args.get('ticket')
     if not ticket:
         # No ticket, the request come from end user, send to CAS login
-        cas_client.service_url = requested_url
+        cas_client.service_url = request.host_url
         cas_login_url = cas_client.get_login_url()
         app.logger.debug('CAS login URL: %s', cas_login_url)
         return redirect(cas_login_url)
