@@ -1,4 +1,4 @@
-from flask import Flask, request, session, redirect, url_for, jsonify
+from flask import Flask, request, session, redirect, jsonify
 from cas import CASClient
 from config import cas_server_url, cas_client_url
 
@@ -7,19 +7,9 @@ app.secret_key = 'DFGtzenDRFz'
 
 cas_client = CASClient(
     version=3,
-    service_url='http://localhost:8080/login?next=%2Fprofile',
     server_url=cas_server_url,
-
 )
 
-@app.route('/')
-def index():
-    return redirect('/static/')
-
-@app.route('/static/')
-#Redirection utile juste en local, sur le serveur NGinx sert lui-même les fichiers static et l'index par default
-def static_index():
-    return redirect('/static/index.html')
 
 @app.route('/data')
 def data(methods=['GET']):
@@ -45,7 +35,7 @@ def login():
     user, attributes, pgtiou = cas_client.verify_ticket(ticket)
 
     if not user:
-        return 'Failed to verify ticket. <a href="/login">Login</a>'
+        return 'La verification de votre ticket a echoue. <a href="/login">Se connecter</a>'
     else:
         session['username'] = user
         session['ticket'] = ticket
@@ -62,7 +52,7 @@ def logout():
 @app.route('/logout_callback')
 def logout_callback():
     session.pop('username', None)
-    return 'Logged out from CAS. <a href="/login">Login</a>'
+    return 'Vous êtes deconnecter du CAS. <a href="/login">Se connecter</a>'
 
 if __name__ == '__main__':
     app.run()
