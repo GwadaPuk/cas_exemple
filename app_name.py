@@ -59,7 +59,16 @@ def login():
     else:
         session['username'] = user
         session['ticket'] = ticket
-        return redirect('/static/' + request.args.get('next'))
+
+        if request.args.get('redirect'):
+            link = request.args.get('redirect')
+            if link[:4] != "http":
+                link = "https://" + link
+            return redirect(link)
+        elif request.args.get('next'):
+            return redirect('/static/' + request.args.get('next'))
+        else:
+            return redirect('/static/index.html')
 
 @app.route('/logout')
 def logout():
