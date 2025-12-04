@@ -55,7 +55,6 @@ def login():
         session['ticket'] = ticket
         return redirect('/static/' + request.args.get('next'))
 
-
 @app.route('/logout')
 def logout():
     redirect_url = cas_client_url + 'logout_callback'
@@ -67,6 +66,15 @@ def logout():
 def logout_callback():
     session.pop('username', None)
     return 'Vous êtes deconnecté du CAS. <a href="/login">Se connecter</a>'
+
+@app.route('/validate_session')
+def validate_session():
+    if 'username' in session:
+        response = jsonify({"valid": True})
+        response.headers['X-Auth-User'] = session['user']  # En-tête personnalisé
+        return response
+    else:
+        return jsonify({"valid": False}), 403
 
 if __name__ == '__main__':
     app.run()
