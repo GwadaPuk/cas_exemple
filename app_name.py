@@ -1,6 +1,6 @@
 from flask import Flask, request, session, redirect, url_for, jsonify
 from cas import CASClient
-from config import cas_server_url, cas_client_url, server_name
+from config import cas_server_url, server_name
 
 app = Flask(__name__)
 app.secret_key = 'DFGtzenDRFz'
