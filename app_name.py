@@ -69,11 +69,13 @@ def logout_callback():
 
 @app.route('/validate_session')
 def validate_session():
+    print('pending validation')
     if 'username' in session:
         response = jsonify({"valid": True})
         response.headers['X-Auth-User'] = session['user']  # En-tête personnalisé
         return response
     else:
+        print('validation failed')
         return jsonify({"valid": False}), 403
 
 if __name__ == '__main__':
