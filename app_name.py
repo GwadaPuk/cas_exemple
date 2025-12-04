@@ -23,7 +23,12 @@ def data(methods=['GET']):
 @app.route('/login')
 def login():
     if 'username' in session:
-        return redirect('/static/' + request.args.get('next'))
+        if request.args.get('redirect'):
+            return redirect(request.args.get('redirect'))
+        elif request.args.get('next'):
+            return redirect('/static/' + request.args.get('next'))
+        else:
+            return redirect('/static/index.html')
 
     ticket = request.args.get('ticket')
     if not ticket:
