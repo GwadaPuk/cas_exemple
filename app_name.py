@@ -35,7 +35,7 @@ def login():
     user, attributes, pgtiou = cas_client.verify_ticket(ticket)
 
     if not user:
-        return 'La verification de votre ticket a echoue. <a href="/login">Se connecter</a>'
+        return 'La vérification de votre ticket a échoué. <a href="/login">Se connecter</a>'
     else:
         session['username'] = user
         session['ticket'] = ticket
@@ -52,7 +52,7 @@ def logout():
 @app.route('/logout_callback')
 def logout_callback():
     session.pop('username', None)
-    return 'Vous êtes deconnecter du CAS. <a href="/login">Se connecter</a>'
+    return 'Vous êtes deconnecté du CAS. <a href="/login">Se connecter</a>'
 
 if __name__ == '__main__':
     app.run()
