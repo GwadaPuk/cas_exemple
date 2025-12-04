@@ -4,7 +4,7 @@ from config import cas_server_url, cas_client_url, server_name
 
 app = Flask(__name__)
 app.secret_key = 'DFGtzenDRFz'
-app.config['CAS_SERVER'] = server_name
+app.config['SERVER_NAME'] = server_name
 
 cas_client = CASClient(
     version=3,
@@ -34,30 +34,20 @@ def data(methods=['GET']):
 @app.route('/login')
 def login():
     if 'username' in session:
-        # Already logged in
         return redirect('/static/' + request.args.get('next'))
 
     ticket = request.args.get('ticket')
     if not ticket:
-        # No ticket, the request come from end user, send to CAS login
         cas_client.service_url = cas_client_url + 'login?next=' + request.args.get('next')
         cas_login_url = cas_client.get_login_url()
-        app.logger.debug('CAS login URL: %s', cas_login_url)
         return redirect(cas_login_url)
 
-    # There is a ticket, the request come from CAS as callback.
-    # need call `verify_ticket()` to validate ticket and get user profile.
-    app.logger.debug('ticket: %s', ticket)
-    app.logger.debug('next: %s', next)
 
     user, attributes, pgtiou = cas_client.verify_ticket(ticket)
 
-    app.logger.debug(
-        'CAS verify ticket response: user: %s, attributes: %s, pgtiou: %s', user, attributes, pgtiou)
-
     if not user:
         return 'Failed to verify ticket. <a href="/login">Login</a>'
-    else:  # Login successfully, redirect according `next` query parameter.
+    else:
         session['username'] = user
         session['ticket'] = ticket
         return redirect('/static/' + request.args.get('next'))
