@@ -41,7 +41,13 @@ def login():
 
     ticket = request.args.get('ticket')
     if not ticket:
-        cas_client.service_url = cas_client_url + 'login?next=' + request.args.get('next')
+        if request.args.get('redirect'):
+            link = request.args.get('redirect')
+            if link[:4] != "http":
+                link = "https://" + link
+            cas_client.service_url = cas_client_url + 'login?redirect=' + link
+        elif request.args.get('next'):
+            cas_client.service_url = cas_client_url + 'login?next=' + request.args.get('next')
         cas_login_url = cas_client.get_login_url()
         return redirect(cas_login_url)
 
