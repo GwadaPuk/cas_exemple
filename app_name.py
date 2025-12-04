@@ -41,7 +41,6 @@ def login():
     if not ticket:
         # No ticket, the request come from end user, send to CAS login
         cas_client.service_url = cas_client_url + 'login?next=' + request.args.get('next')
-        print(server_name + 'login?next=' + request.args.get('next'))
         cas_login_url = cas_client.get_login_url()
         app.logger.debug('CAS login URL: %s', cas_login_url)
         return redirect(cas_login_url)
@@ -61,7 +60,7 @@ def login():
     else:  # Login successfully, redirect according `next` query parameter.
         session['username'] = user
         session['ticket'] = ticket
-        return redirect(next)
+        return redirect(server_name + request.args.get('next'))
 
 
 @app.route('/logout')
