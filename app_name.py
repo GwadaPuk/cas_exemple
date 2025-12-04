@@ -35,7 +35,7 @@ def data(methods=['GET']):
 def login():
     if 'username' in session:
         # Already logged in
-        return redirect(request.args.get('next'))
+        return redirect('/static/' + request.args.get('next'))
 
     ticket = request.args.get('ticket')
     if not ticket:
@@ -60,7 +60,7 @@ def login():
     else:  # Login successfully, redirect according `next` query parameter.
         session['username'] = user
         session['ticket'] = ticket
-        return redirect(request.args.get('next'))
+        return redirect('/static/' + request.args.get('next'))
 
 
 @app.route('/logout')
