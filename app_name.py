@@ -4,6 +4,12 @@ from config import cas_server_url, cas_client_url
 
 app = Flask(__name__)
 app.secret_key = 'DFGtzenDRFz'
+app.config.update(
+    SESSION_COOKIE_DOMAIN='.bouillabaisse.ec-m.fr',
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='None',
+)
 
 cas_client = CASClient(
     version=3,
