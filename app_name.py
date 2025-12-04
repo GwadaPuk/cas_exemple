@@ -87,7 +87,7 @@ def validate_session():
     print('pending validation')
     if 'username' in session:
         response = jsonify({"valid": True})
-        response.headers['X-Auth-User'] = session['user']  # En-tête personnalisé
+        response.headers['X-Auth-User'] = session['username']
         return response
     else:
         print('validation failed')
