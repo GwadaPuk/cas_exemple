@@ -1,13 +1,15 @@
 from flask import Flask, request, session, redirect, url_for, jsonify
 from cas import CASClient
+from config import cas_server_url, cas_client_url, server_name
 
 app = Flask(__name__)
 app.secret_key = 'DFGtzenDRFz'
+app.config['CAS_SERVER'] = server_name
 
 cas_client = CASClient(
     version=3,
     service_url='http://localhost:8080/login?next=%2Fprofile',
-    server_url='https://ident.univ-amu.fr/cas/login',
+    server_url=cas_server_url,
 
 )
 
@@ -33,13 +35,12 @@ def data(methods=['GET']):
 def login():
     if 'username' in session:
         # Already logged in
-        return redirect(url_for(session['next']))
+        return redirect(url_for('static/' + request.args.get('next')))
 
-    next = request.args.get('next')
-    session['next'] = next
     ticket = request.args.get('ticket')
     if not ticket:
         # No ticket, the request come from end user, send to CAS login
+        cas_client.service_url = request.url
         cas_login_url = cas_client.get_login_url()
         app.logger.debug('CAS login URL: %s', cas_login_url)
         return redirect(cas_login_url)

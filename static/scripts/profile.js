@@ -10,7 +10,7 @@ if ('username' in res) {
     button.textContent = 'Se déconnecter';
 } else {
     profile.textContent = 'Vous n\'êtes pas connecté';
-    button.href = "/login";
+    button.href = "/login?next=profile";
     button.textContent = 'Se connecter';
 }
 
