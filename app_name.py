@@ -9,6 +9,7 @@ app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='None',
+    PERMANENT_SESSION_LIFETIME=60*60*24*30,
 )
 
 cas_client = CASClient(
@@ -84,13 +85,11 @@ def logout_callback():
 
 @app.route('/validate_session')
 def validate_session():
-    print('pending validation')
     if 'username' in session:
         response = jsonify({"valid": True})
         response.headers['X-Auth-User'] = session['username']
         return response
     else:
-        print('validation failed')
         return jsonify({"valid": False}), 403
 
 if __name__ == '__main__':
