@@ -58,6 +58,7 @@ def login():
     if not user:
         return 'La vérification de votre ticket a échoué. <a href="/login">Se connecter</a>'
     else:
+        session.permanent = True
         session['username'] = user
         session['ticket'] = ticket
 
