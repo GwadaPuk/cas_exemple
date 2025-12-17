@@ -1,9 +1,9 @@
 from flask import Flask, request, session, redirect, jsonify
 from cas import CASClient
-from config import cas_server_url, cas_client_url
+from config import cas_server_url, cas_client_url, secret_key
 
 app = Flask(__name__)
-app.secret_key = 'DFGtzenDRFz'
+app.secret_key = secret_key
 app.config.update(
     SESSION_COOKIE_DOMAIN='.bouillabaisse.ec-m.fr',
     SESSION_COOKIE_SECURE=True,
