@@ -87,9 +87,9 @@ def logout_callback():
 @app.route('/validate_session')
 def validate_session():
     if 'username' in session:
-        return 200
+        return jsonify({"valid": True})
     else:
-        return 403
+        return jsonify({"valid": False})
 
 if __name__ == '__main__':
     app.run()
