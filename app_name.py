@@ -95,7 +95,7 @@ def validate_session():
             """
             <h1>Accès non-autorisé, veuillez vous <a href="https://lotte.bouillabaisse.ec-m.fr/login?redirect=https://vive.bouillabaisse.ec-m.fr/login">connecter</a>;
             """,
-            status_code=401
+            status_code=403
         ))
         return res
 
