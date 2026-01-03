@@ -94,7 +94,7 @@ def validate_session():
         res = make_response(render_template_string(
             """
             <h1>Accès non-autorisé, veuillez vous <a href="https://lotte.bouillabaisse.ec-m.fr/login?redirect=https://vive.bouillabaisse.ec-m.fr/login">connecter</a>;
-            """), 403)
+            """), 401)
         return res
 
 if __name__ == '__main__':
