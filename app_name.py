@@ -1,4 +1,4 @@
-from flask import Flask, request, session, redirect, jsonify
+from flask import Flask, request, session, redirect, jsonify, make_response, render_template_string
 from cas import CASClient
 from config import cas_server_url, cas_client_url, secret_key
 
@@ -91,7 +91,13 @@ def validate_session():
         response.headers['X-Auth-User'] = session['username']
         return response
     else:
-        return jsonify({"valid": False}), 403
+        res = make_response(render_template_string(
+            """
+            <h1>Accès non-autorisé, veuillez vous <a href="https://lotte.bouillabaisse.ec-m.fr/login?redirect=https://vive.bouillabaisse.ec-m.fr/login">connecter</a>;
+            """,
+            status_code=401
+        ))
+        return res
 
 if __name__ == '__main__':
     app.run()
