@@ -88,10 +88,7 @@ def logout_callback():
 
 @app.route('/validate_session')
 def validate_session():
-    if 'username' in session:
-        print(session['username'])
-        print(session['attributes'])
-        print(session['pgtiou'])
+    if 'username' in session and 'attributes' in session and (session['attributes']['supannEtuEtape']=='SMP3I1' or session['username']=='vemiya'):
         return "", 200
     else:
         return "", 403
