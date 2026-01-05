@@ -61,6 +61,8 @@ def login():
         session.permanent = True
         session['username'] = user
         session['ticket'] = ticket
+        session['attributes'] = attributes
+        session['pgtiou'] = pgtiou
 
         if request.args.get('redirect'):
             link = request.args.get('redirect')
@@ -87,6 +89,9 @@ def logout_callback():
 @app.route('/validate_session')
 def validate_session():
     if 'username' in session:
+        print(session['username'])
+        print(session['attributes'])
+        print(session['pgtiou'])
         return "", 200
     else:
         return "", 403
